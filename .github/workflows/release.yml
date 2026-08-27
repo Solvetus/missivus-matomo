@@ -13,6 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # actions/checkout fetches the tag PEELED (a lightweight ref at the commit),
+      # so %(contents) would return the commit message. Re-fetch the real
+      # annotated tag object first.
+      - name: Read the annotated tag message
+        id: tag
+        run: |
+          git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+          test "$(git cat-file -t "${GITHUB_REF_NAME}")" = "tag" || { echo "not an annotated tag"; exit 1; }
+          {
+            echo "body<<EOF_BODY"
+            git tag -l --format='%(contents)' "${GITHUB_REF_NAME}"
+            echo "EOF_BODY"
+          } >> "$GITHUB_OUTPUT"
       - uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
+          name: ${{ github.ref_name }}
+          body: ${{ steps.tag.outputs.body }}
+          generate_release_notes: false
