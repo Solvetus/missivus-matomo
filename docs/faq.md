@@ -151,6 +151,16 @@ The WordPress sibling has shipped — along with **missivus-nextcloud** and **mi
 send Nextcloud's and Ghost's own outbound email the same way. See
 [missivus.com](https://missivus.com) for all four.
 
+## Which version do I install — Matomo 5 or Matomo 6?
+
+| Matomo version | Missivus release line | Branch | PHP |
+| --- | --- | --- | --- |
+| Matomo 5.x | 0.1.x | `main` | 7.2.5 or later |
+| Matomo 6.x | 1.x | `6.x-dev` | 8.1 or later |
+
+The Marketplace offers the right line automatically, based on the Matomo version you have
+installed. A manual install from GitHub takes the latest tag on the branch matching your Matomo.
+
 ## Where do I report a bug, or a security problem?
 
 Bugs and feature requests: the

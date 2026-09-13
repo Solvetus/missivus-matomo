@@ -2,6 +2,13 @@
 
 This guide assumes you have **never used Microsoft Entra before**. Every click is spelled out.
 
+Pick the release line that matches your Matomo:
+
+| Matomo version | Missivus release line | Branch | PHP |
+| --- | --- | --- | --- |
+| Matomo 5.x | 0.1.x | `main` | 7.2.5 or later |
+| Matomo 6.x | 1.x | `6.x-dev` | 8.1 or later |
+
 You will need:
 
 - An account in your Microsoft 365 tenant that can create app registrations and grant admin consent

@@ -460,6 +460,10 @@ So **PHP 7.2.5 is the floor** and the portable class uses no syntax above it: no
 no arrow functions, no `??=`, no constructor promotion, no `match`, no trailing commas in argument
 lists.
 
+On the `6.x-dev` line the floor is **PHP 8.1.0** — Matomo 6's own floor (`composer.json` on
+`6.x-dev` declares `"php": "8.1.0"` as the platform pin and `">=8.1.0"` in `require`) — which is a
+superset of the syntax above, so no code change was needed on that branch.
+
 The local toolchain is PHP 8.5.9, which would happily parse 7.4+ syntax and hide a violation. So the
 floor is verified **empirically** by linting every file inside a `php:7.2-cli` container:
 
@@ -511,6 +515,10 @@ UMD file** in the exact wrapper shape Matomo's own plugins use (verified against
 Every coupling to Matomo, so an upgrade can be diffed against this table. All verified against
 `matomo-org/matomo` branch `5.x-dev` (`Version::VERSION` = `5.14.0-alpha`) on 2026-08-16; the
 deployment target is **5.12.0**, the current stable release.
+
+Re-verified against `matomo-org/matomo` branch `6.x-dev` on 2026-09-13 for the Matomo 6 release
+line (`6.x-dev`, plugin version 1.x): every row below is unchanged on Matomo 6 — same
+signatures, same DI seam, same asset-loading contract. No code change was needed.
 
 | # | Class | Member used | How it is used | Breaks if |
 | --- | --- | --- | --- | --- |

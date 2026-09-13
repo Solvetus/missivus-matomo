@@ -4,6 +4,28 @@ All notable changes to Missivus for Matomo are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] — Unreleased
+
+First release of the Matomo 6 line. Functionally identical to 0.1.5; the version number
+marks the platform, not new behaviour.
+
+### Compatibility
+
+| Matomo version | Missivus release line | Branch | PHP |
+| --- | --- | --- | --- |
+| Matomo 5.x | 0.1.x | `main` | 7.2.5 or later |
+| Matomo 6.x | 1.x | `6.x-dev` | 8.1 or later |
+
+### Changed
+
+- `plugin.json`: `"matomo": ">=6.0.0-b1,<7.0.0-b1"`, `"php": ">=8.1.0"`. Matomo 5 stays
+  on the 0.1.x line (`main`); Matomo 6 is the 1.x line (`6.x-dev`).
+
+### Added
+
+- GitHub Actions plugin tests on Matomo 6 (PHP 8.1 and 8.5; MySQL 8.0 and MariaDB 10.6).
+- Compatibility table in the README, installation guide and FAQ.
+
 ## [0.1.5] — 2026-08-19
 
 ### Fixed
