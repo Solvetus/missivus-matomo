@@ -333,9 +333,17 @@ correct one.
 
 ### 6.5 `PIWIK_TEST_MODE`
 
-The stock transport short-circuits to a `Test.Mail.send` event when `PIWIK_TEST_MODE` is defined
-*(verified, `core/Mail/Transport.php:106-113`)*. `GraphTransport` defers to `parent::send()` in that
-case so Matomo's own integration tests keep passing with the plugin active.
+The stock transport already short-circuits to a `Test.Mail.send` event when `PIWIK_TEST_MODE` is
+defined *(verified, `core/Mail/Transport.php:106-113`)*. `GraphTransport` must **not** add a guard
+of its own on that constant: Matomo's `tests/PHPUnit/bootstrap.php` defines it unconditionally, so
+under `./console tests:run` a plugin-level guard sends every `send()` straight to
+`sendWithDefaultTransport()` before the enabled/fallback logic ever runs — the plugin's own suite
+then passes vacuously, with zero requests reaching the fake Graph endpoint. Found in CI run
+34752693137 (first run on the `6.x-dev` line, all 8 matrix cells, 5 errors + 5 failures in
+`GraphTransportTest`) and fixed 2026-09-13: the guard is gone, and the standalone runner
+(`tests/run.php`) now defines the constant itself so the failure reproduces there too. When the
+plugin is off, or activated with `enabled = false`, behaviour is unchanged — that path already
+lands on `parent::send()` and therefore on core's own `Test.Mail.send` hack.
 
 ---
 
@@ -536,7 +544,7 @@ signatures, same DI seam, same asset-loading contract. No code change was needed
 | 12 | `Piwik\DI` | `autowire()` | The DI binding in `config/config.php`. | Matomo 5 wraps PHP-DI here; a DI-library swap changes it. |
 | 13 | Asset pipeline | `vue/dist/<Plugin>.umd.min.js` + `vue/dist/umd.metadata.json` | The Vue component. | Bundling scheme changes (it already changed once, in Matomo 4→5). |
 | 14 | `Piwik\Container\StaticContainer` | `get()` | Used by the API to obtain the transport's collaborators. | Rename. |
-| 15 | `PIWIK_TEST_MODE` constant | — | `GraphTransport` defers to the stock transport when defined, so Matomo's own integration tests keep passing with the plugin active *(mirrors `core/Mail/Transport.php:106`)*. | The constant being renamed or the hack removed. |
+| 15 | `PIWIK_TEST_MODE` constant | — | Not used by the plugin. Core's `Transport::send()` posts `Test.Mail.send` and returns early under it; reached only through `parent::send()` when Missivus is off or falls back. | The plugin ever re-adds a guard on it (regression test `testMatomosTestModeDoesNotBypassTheTransport`). |
 | 16 | `Piwik\Settings\Plugin\SystemSettings` | public `$setting` properties + `Setting::getValue()` | `Configuration\Settings` reads settings by property name. | Storage API change. |
 
 Item 4 is the one to check first on any Matomo upgrade.

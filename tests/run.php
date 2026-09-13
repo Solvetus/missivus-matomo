@@ -20,6 +20,12 @@
  * When PHPUnit is present its TestCase wins; the shim below is only defined in its absence.
  */
 
+// Matomo's tests/PHPUnit/bootstrap.php defines this unconditionally, so the standalone runner
+// does too: a code path that behaves differently under it must fail here, not only in CI.
+if (!defined('PIWIK_TEST_MODE')) {
+    define('PIWIK_TEST_MODE', true);
+}
+
 require_once __DIR__ . '/Framework/TestCase.php';
 require_once __DIR__ . '/Framework/Doubles.php';
 require_once __DIR__ . '/../libs/autoload.php';

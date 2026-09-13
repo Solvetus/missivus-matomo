@@ -70,12 +70,6 @@ class GraphTransport extends Transport
      */
     public function send(Mail $mail)
     {
-        // Matomo's own test suite asserts on the PHPMailer object via the Test.Mail.send event.
-        // Keep that intact so having Missivus active does not break core integration tests.
-        if (defined('PIWIK_TEST_MODE')) {
-            return $this->sendWithDefaultTransport($mail);
-        }
-
         // Not an error: the switch is off, so Matomo's configured transport is the right one.
         if (!$this->config->isEnabled()) {
             return $this->sendWithDefaultTransport($mail);
