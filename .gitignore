@@ -25,3 +25,4 @@ Thumbs.db
 
 # Build output
 /dist/
+/vue/dist/*.umd.js

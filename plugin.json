@@ -1,6 +1,6 @@
 {
     "name": "Missivus",
-    "version": "0.1.5",
+    "version": "1.0.0",
     "description": "Missivus for Matomo — send Matomo email through Microsoft Graph with application permissions and a shared mailbox. No SMTP, no user login.",
     "theme": false,
     "category": "integration",
@@ -24,7 +24,7 @@
         "exclude": ["/dist", "/tools", "/PLAN.md", "/docs/BRIEF.md"]
     },
     "require": {
-        "matomo": ">=5.0.0-b1,<6.0.0-b1",
-        "php": ">=7.2.5"
+        "matomo": ">=6.0.0-b1,<7.0.0-b1",
+        "php": ">=8.1.0"
     }
 }
