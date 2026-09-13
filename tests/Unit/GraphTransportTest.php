@@ -329,6 +329,21 @@ class GraphTransportTest extends TestCase
         );
     }
 
+    public function testMatomosTestModeDoesNotBypassTheTransport()
+    {
+        // Matomo's PHPUnit bootstrap defines PIWIK_TEST_MODE unconditionally and tests/run.php
+        // mirrors it. A guard on that constant once sent every send() straight to PHPMailer under
+        // ./console tests:run, so this whole class passed without one request reaching Graph.
+        $this->assertTrue(defined('PIWIK_TEST_MODE'), 'Both runners define PIWIK_TEST_MODE');
+
+        $this->queueSuccessfulSend();
+        $transport = $this->transport();
+
+        $this->assertTrue($transport->send($this->simpleMail()));
+        $this->assertSame(2, $this->http->count(), 'The token request and the send reached the fake Graph endpoint');
+        $this->assertSame(0, $transport->defaultTransportCalls, 'PHPMailer was not used');
+    }
+
     /**
      * @param string $text
      * @param string $where
