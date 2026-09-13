@@ -61,8 +61,12 @@ verify it actually took effect.
 
 ### What you need
 
-- Matomo 5.0 or later (developed and tested against 5.12.0)
-- PHP 7.2.5 or later — Matomo 5's own floor — with the `openssl` and `json` extensions
+| Matomo version | Missivus release line | Branch | PHP |
+| --- | --- | --- | --- |
+| Matomo 5.x | 0.1.x | `main` | 7.2.5 or later |
+| Matomo 6.x | 1.x | `6.x-dev` | 8.1 or later |
+
+- PHP with the `openssl` and `json` extensions (PHP 7.2.5 or later on the 0.1.x line, 8.1 or later on the 1.x line)
 - A Microsoft 365 tenant, and an administrator who can create an app registration, grant admin
   consent, and run one Exchange Online PowerShell command
 - A shared mailbox to send from. It needs **no licence**
