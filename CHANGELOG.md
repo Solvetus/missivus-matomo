@@ -4,9 +4,9 @@ All notable changes to Missivus for Matomo are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] — Unreleased
+## [1.0.0] — 2026-09-13
 
-First release of the Matomo 6 line. Functionally identical to 0.1.5; the version number
+First release of the Matomo 6 line. Functionally identical to 0.1.6; the version number
 marks the platform, not new behaviour.
 
 ### Compatibility
@@ -15,6 +15,21 @@ marks the platform, not new behaviour.
 | --- | --- | --- | --- |
 | Matomo 5.x | 0.1.x | `main` | 7.2.5 or later |
 | Matomo 6.x | 1.x | `6.x-dev` | 8.1 or later |
+
+### Fixed
+
+- **The `PIWIK_TEST_MODE` guard in `GraphTransport::send()` made the entire unit suite pass
+  vacuously under Matomo's own test runner.** Matomo's `tests/PHPUnit/bootstrap.php` defines that
+  constant unconditionally, and the guard checked it before the enabled setting — so under
+  `./console tests:run` every send short-circuited to the PHPMailer fallback before the fake Graph
+  endpoint the tests inject was ever reached. Caught by the first CI run on this line (all 8 matrix
+  cells, 5 errors + 5 failures in `GraphTransportTest`); the standalone runner (`tests/run.php`)
+  never defined the constant, which is why it stayed green locally and in every prior release. The
+  guard duplicated a short-circuit Matomo's own stock transport already performs
+  (`core/Mail/Transport.php:106-113`) and served no purpose once accounted for, so it is removed
+  outright — the transport is now decided solely by the enabled setting and the fallback rule.
+  `tests/run.php` now defines `PIWIK_TEST_MODE` itself so this class of bug reproduces locally, and
+  a regression test guards against it returning.
 
 ### Changed
 
@@ -25,6 +40,28 @@ marks the platform, not new behaviour.
 
 - GitHub Actions plugin tests on Matomo 6 (PHP 8.1 and 8.5; MySQL 8.0 and MariaDB 10.6).
 - Compatibility table in the README, installation guide and FAQ.
+
+## [0.1.6] — 2026-09-13
+
+### Fixed
+
+- **The `PIWIK_TEST_MODE` guard in `GraphTransport::send()` made the entire unit suite pass
+  vacuously under Matomo's own test runner.** Matomo's `tests/PHPUnit/bootstrap.php` defines that
+  constant unconditionally, and the guard checked it before the enabled setting — so under
+  `./console tests:run` every send short-circuited to the PHPMailer fallback before the fake Graph
+  endpoint the tests inject was ever reached. Caught by the first CI run on the Matomo 6 line (all
+  8 matrix cells, 5 errors + 5 failures in `GraphTransportTest`); the standalone runner
+  (`tests/run.php`) never defined the constant, which is why it stayed green locally and in every
+  prior release. The guard duplicated a short-circuit Matomo's own stock transport already
+  performs (`core/Mail/Transport.php:106-113`) and served no purpose once accounted for, so it is
+  removed outright — the transport is now decided solely by the enabled setting and the fallback
+  rule. `tests/run.php` now defines `PIWIK_TEST_MODE` itself so this class of bug reproduces
+  locally, and a regression test guards against it returning.
+
+### Changed
+
+- Compatibility table in the README, installation guide and FAQ (Matomo 5 → 0.1.x on `main`,
+  Matomo 6 → 1.x on `6.x-dev`).
 
 ## [0.1.5] — 2026-08-19
 
@@ -177,6 +214,8 @@ Initial release.
   test-email button.
 - Optional fallback to Matomo's own transport, off by default; nothing is ever swallowed.
 
+[1.0.0]: https://github.com/Solvetus/missivus-matomo/releases/tag/v1.0.0
+[0.1.6]: https://github.com/Solvetus/missivus-matomo/releases/tag/v0.1.6
 [0.1.5]: https://github.com/Solvetus/missivus-matomo/releases/tag/v0.1.5
 [0.1.4]: https://github.com/Solvetus/missivus-matomo/releases/tag/v0.1.4
 [0.1.3]: https://github.com/Solvetus/missivus-matomo/releases/tag/v0.1.3
