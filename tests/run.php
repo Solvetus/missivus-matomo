@@ -61,11 +61,8 @@ foreach ($testClasses as $class) {
             $test = $reflection->newInstance();
 
             // setUp is protected under real PHPUnit. setAccessible is a no-op from PHP 8.1 and
-            // deprecated from 8.5, so only reach for it on the versions that need it.
+            // deprecated from 8.5 — the 8.1 floor on this line means it is never needed.
             $setUp = $reflection->getMethod('setUp');
-            if (PHP_VERSION_ID < 80100) {
-                $setUp->setAccessible(true);
-            }
             $setUp->invoke($test);
 
             $test->{$name}();
