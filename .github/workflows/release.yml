@@ -1,5 +1,12 @@
 name: Release
 
+# On a `v*` tag push, create the GitHub Release. The BODY is the annotated tag
+# message, written from the commit log at tagging time (fleet release rule: never
+# generated notes). Uses the first-party gh CLI, never a third-party release
+# action: this job holds `contents: write`, so a third-party action here would be
+# a supply-chain path into the repo. One file, byte-identical across the fleet
+# (the audit script compares its SHA-256); do not edit it per repo.
+
 on:
   push:
     tags:
@@ -12,24 +19,22 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       # actions/checkout fetches the tag PEELED (a lightweight ref at the commit),
       # so %(contents) would return the commit message. Re-fetch the real
       # annotated tag object first.
-      - name: Read the annotated tag message
-        id: tag
+      - name: Create or update the Release from the tag message
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
           test "$(git cat-file -t "${GITHUB_REF_NAME}")" = "tag" || { echo "not an annotated tag"; exit 1; }
-          {
-            echo "body<<EOF_BODY"
-            git tag -l --format='%(contents)' "${GITHUB_REF_NAME}"
-            echo "EOF_BODY"
-          } >> "$GITHUB_OUTPUT"
-      - uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          body: ${{ steps.tag.outputs.body }}
-          generate_release_notes: false
+          git tag -l --format='%(contents)' "${GITHUB_REF_NAME}" > "${RUNNER_TEMP}/notes.md"
+          test -s "${RUNNER_TEMP}/notes.md" || { echo "empty tag message"; exit 1; }
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            gh release edit "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes-file "${RUNNER_TEMP}/notes.md"
+          else
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --notes-file "${RUNNER_TEMP}/notes.md" --verify-tag
+          fi
